@@ -42,7 +42,8 @@ rip-current-alert/
 │   │   └── alert/          FCM 발송 · 알림 게이트 · 이벤트 저장
 │   └── android_alert/      안드로이드 알림 앱 (Kotlin, FCM 수신)
 └── docs/
-    └── 01_기획보고서.md     프로젝트 기획보고서 (최종본)
+    ├── 01_기획보고서.md     프로젝트 기획보고서 (최종본)
+    └── presentation/       최종 발표자료 (pptx)
 ```
 
 <br>
@@ -123,6 +124,7 @@ streamlit run app.py
 | `apps/web_console/` | [gonggong77/team_beavers](https://github.com/gonggong77/team_beavers) | `rip_service_console/` |
 | `apps/android_alert/` | [gonggong77/team_beavers](https://github.com/gonggong77/team_beavers) | `rip_current_app/rip_current_app/AndroidStudioProjects/RipCurrentAlert/` |
 | `docs/01_기획보고서.md` | 팀 Notion 운영 보드 | 기획서 최종 |
+| `docs/presentation/` | 팀 최종 발표자료 | - |
 
 옮기면서 바꾼 점:
 - 개인 IDE 설정(`*.csproj.user`, `*.pubxml.user`, `.idea/`, `.vs/`)과 Firebase 설정 파일(`google-services.json`)은 제외했습니다.
@@ -205,4 +207,4 @@ streamlit run app.py
 - 사람 모델은 학습 데이터 기준 점수(mAP50 0.91)와 처음 보는 데이터 점수(0.50)의 차이가 컸습니다. 학습과 분리된 평가셋을 처음부터 만드는 것이 다음 과제입니다.
 - 실제 CCTV 실시간 스트림 연동, 해양 관측 데이터(이안류 지수·파고·풍속) 결합, 다중 카메라 대시보드는 향후 확장 범위로 남겼습니다.
 
-자세한 기획 배경과 요구사항은 [`docs/01_기획보고서.md`](docs/01_기획보고서.md)를 참고하세요.
+자세한 기획 배경과 요구사항은 [`docs/01_기획보고서.md`](docs/01_기획보고서.md), 최종 발표 내용은 [`docs/presentation/이안류_프로젝트_발표자료.pptx`](docs/presentation/이안류_프로젝트_발표자료.pptx)를 참고하세요.
