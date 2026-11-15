@@ -119,9 +119,7 @@ streamlit run app.py
 
 | 이 저장소 | 원본 저장소 | 원본 경로 |
 | --- | --- | --- |
-| `models/rip_current/` | [artaban125/CV_Project_rip_current_detect](https://github.com/artaban125/CV_Project_rip_current_detect) | `/` |
 | `models/person/` | [Miita212/CV_Project_person_detect](https://github.com/Miita212/CV_Project_person_detect) | `/` |
-| `apps/desktop_console/` | [artaban125/rip_current_console_app](https://github.com/artaban125/rip_current_console_app) | `/` |
 | `apps/web_console/` | [gonggong77/team_beavers](https://github.com/gonggong77/team_beavers) | `rip_service_console/` |
 | `apps/android_alert/` | [gonggong77/team_beavers](https://github.com/gonggong77/team_beavers) | `rip_current_app/rip_current_app/AndroidStudioProjects/RipCurrentAlert/` |
 | `docs/01_기획보고서.md` | 팀 Notion 운영 보드 | 기획서 최종 |
