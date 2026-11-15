@@ -1,0 +1,49 @@
+# ===== 비밀 정보 =====
+.env
+.env.*
+!.env.example
+serviceAccountKey.json
+**/serviceAccountKey*.json
+google-services.json
+.streamlit/secrets.toml
+
+# ===== 데이터 · 가중치 · 실행 산출물 =====
+*.pt
+*.pth
+runs/
+dataset*/
+**/data/events.db
+**/static/snapshots/
+snapshots/
+test_video/
+*.mp4
+
+# ===== Python =====
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# ===== .NET / Visual Studio =====
+.vs/
+bin/
+obj/
+dist/
+*.user
+*.suo
+
+# ===== Android =====
+.gradle/
+.idea/
+build/
+local.properties
+*.apk
+*.aab
+.cxx/
+captures/
+
+# ===== OS =====
+.DS_Store
+Thumbs.db
+desktop.ini
