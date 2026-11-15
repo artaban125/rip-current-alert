@@ -57,7 +57,7 @@ rip-current-alert/
 | 데스크톱 콘솔 | C# .NET 8 WPF, ONNX Runtime (DirectML), OpenCvSharp4, SQLite, Firebase Admin |
 | 웹 콘솔 | Python, Streamlit, OpenCV, SQLite, firebase-admin |
 | 모바일 | Kotlin, Android, Firebase Cloud Messaging |
-| 데이터 | AI-Hub 이안류 CCTV 데이터, Roboflow search-and-rescue |
+| 데이터 | AI-Hub 이안류 CCTV 데이터, 스페인 발레아레스 해변 이안류 데이터, Roboflow search-and-rescue |
 
 <br>
 
@@ -136,27 +136,26 @@ streamlit run app.py
 
 | 팀원 | 담당 영역 | 주요 결과물 | 서비스에 쓰인 곳 |
 | --- | --- | --- | --- |
-| knlee | 이안류 탐지 모델 · 데스크톱 관제 콘솔 · 알림 서비스 | YOLO11 s/m/x 이안류 모델, .NET 8 WPF 관제 콘솔, FCM 발송 모듈·알림 게이트 | 두 콘솔의 이안류 구역 탐지, 데스크톱 관제 전체, 긴급 알림 발송 |
+| knlee | 이안류 탐지 모델 · 데스크톱 관제 콘솔 · 알림 서비스 | Dataset v2(11,460장), YOLO11m 이안류 모델(미지 해변 Recall 0.3664), .NET 8 WPF 관제 콘솔, FCM 발송 모듈·알림 게이트 | 두 콘솔의 이안류 구역 탐지, 데스크톱 관제 전체, 긴급 알림 발송 |
 | Miita212, jongho | 사람(입수자) 탐지 모델 | YOLO11m 사람 모델 1차 학습 + 작은 사람 파인튜닝 | 두 콘솔의 입수자 탐지 (`swimmer` 모델) |
 | gonggong77 | 웹 관제 콘솔 · 안드로이드 앱 | Streamlit 영상 분석 화면·듀얼 모델 추론 파이프라인, Android 알림 수신 앱 | 시연용 웹 관제 화면, 현장 알림 수신 |
 
 ### knlee — 이안류 탐지 모델 · 데스크톱 관제 콘솔 · 알림 서비스
 
-**`models/rip_current/` — 이안류 탐지 모델**
-- **데이터 정제 (`dataset.ipynb`)**
-  - AI-Hub「이안류 CCTV 데이터」의 파일명 메타데이터(`[해수욕장]_[카메라]_[YYYYMMDD]_[HHMMSS]`)를 파싱해 지점·시간대별 분포 분석
-  - JSON 라벨 좌표를 YOLO 포맷(`cls x_center y_center w h`)으로 정규화 변환
-  - 같은 카메라 기준 **15초 이내 연사 프레임 제거**로 중복 이미지 정리
-- **도메인 격리 분할 (데이터 누수 방지)**
-  - Train / Valid: 해운대·송정·중문을 **날짜 단위**로 분할 (9,200 / 1,200장)
-  - Test: 낙산·대천을 **학습에 쓰지 않은 지점**으로 완전 격리 (600장)
-  - Positive(이안류) 대 Negative(배경) 비율을 맞춰 오탐 제어
-- **YOLO11 스케일별 학습 스크립트**
-  - `yolo11s`: 8GB VRAM 로컬 학습 (SGD, batch 8, AMP)
-  - `yolo11m`: batch 4 + 선형 학습률 스케일링(`lr0=0.0025`)으로 약 5.8GB VRAM에서 1024 해상도 학습
-  - `yolo11x`: A100 전용 (TF32 / bfloat16, AdamW + cosine LR, mixup 0.15)
+**`models/rip_current/` — 이안류 탐지 모델** (자세한 내용: [`models/rip_current/README.md`](models/rip_current/README.md))
+- **Dataset v2 구축 (279,151장 → 11,460장 · 7개 해변)**
+  - 1차 무작위 분할에서 같은 카메라·시간대 프레임이 Train/Val에 섞여, 검증 mAP50 0.7410이 미지 해변 Recall 0.2031(미탐 79.7%)로 무너지는 원인을 진단
+  - 4단계 정제: 15초 간격 샘플링 · 날짜·시간·카메라 기준 **GroupKFold 분할** · 주간 1080p 이상 선별 · 스페인 발레아레스 해변 2곳 결합(OBB → HBB)
+  - Train 9,810 / Val 1,250 / **미지 해변 Test 400**(낙산·대천 완전 격리), 파도 포말 오탐 방지용 배경 이미지 20% 편성
+- **이안류 탐지 학습과 모델 선정 (YOLO11 s · m · x)**
+  - SAM으로 만든 마스크 라벨의 세그멘테이션 학습이 붕괴(mask mAP50 0.0042)해 **BBox 탐지로 전환**
+  - 같은 Dataset v2로 s(9.4M) · m(20.1M) · x(56.9M) 비교: x는 해안 배경을 외워 미지 해변 Recall 0.0662로 하락 — 모델 크기와 일반화의 **역 U자 관계** 확인
+- **최종 모델 YOLO11m**
+  - 검증 mAP50 **0.7526** · P 0.7200 · R 0.6975 / 미지 해변 mAP50 0.2546 · Recall **0.3664** · F1 0.4023
+  - 미지 해변 Recall 0.2031 → 0.3664 (**+80.4%**)
 
 **`apps/desktop_console/` — 데스크톱 관제 콘솔 (C# .NET 8 WPF)**
+- **30 FPS 실시간 관제**: 원본 영상을 실시간 처리하고, 위험 판정 후 3초 이내에 안전요원 앱으로 스냅샷 알림 전송
 - **ONNX 추론 엔진 (`YoloDetector.cs`)**: ONNX Runtime + **DirectML GPU 가속**, 모델 입력 크기 자동 감지, GPU 실패 시 CPU로 대체하고 원인을 팝업으로 표시
 - **실시간 처리 루프 (`MainWindow.xaml.cs`)**
   - 3프레임마다 처리하고, 이안류 추론은 그중 다시 3번에 1번만 돌린 뒤 결과를 캐시해 속도 확보
@@ -204,6 +203,7 @@ streamlit run app.py
 ## 결과와 한계
 
 - 이안류 구역과 입수자를 함께 탐지하고, 구역 안 인원이 생기면 **수 초 안에 스마트폰으로 현장 사진이 포함된 알림**이 도착하는 흐름을 웹·데스크톱 두 가지 콘솔로 구현했습니다.
+- 이안류 모델은 처음 보는 해변(낙산·대천) 기준 Recall을 0.2031에서 0.3664로 80.4% 끌어올렸습니다. 모델 크기보다 **분할 설계와 데이터 정제**가 실전 성능을 결정한다는 것을 확인했습니다.
 - 사람 모델은 학습 데이터 기준 점수(mAP50 0.91)와 처음 보는 데이터 점수(0.50)의 차이가 컸습니다. 학습과 분리된 평가셋을 처음부터 만드는 것이 다음 과제입니다.
 - 실제 CCTV 실시간 스트림 연동, 해양 관측 데이터(이안류 지수·파고·풍속) 결합, 다중 카메라 대시보드는 향후 확장 범위로 남겼습니다.
 
