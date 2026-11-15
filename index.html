@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>이안류 긴급 알리미 | 팀 비버즈</title>
+  <meta name="description" content="해안 CCTV에서 이안류 구역과 입수자를 동시에 탐지하고, 위험 구역 안에 사람이 들어가면 3초 안에 안전요원 스마트폰으로 알리는 관제 보조 시스템">
+  <style>
+    :root {
+      --bg: #f7faf9;
+      --surface: #ffffff;
+      --ink: #1b2326;
+      --muted: #56636a;
+      --line: #dfe8e6;
+      --accent: #0f766e;
+      --accent-ink: #0f766e;
+      --tint: #e7f4f1;
+      --dark: #24343a;
+      --code-bg: #eef3f2;
+      --danger: #c8102e;
+      --warn: #d97706;
+      --safe: #2e9e5b;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0f1517;
+        --surface: #172024;
+        --ink: #e6eef0;
+        --muted: #9eb0b5;
+        --line: #26343a;
+        --accent: #2dd4bf;
+        --accent-ink: #5eead4;
+        --tint: #13292a;
+        --dark: #0a0f11;
+        --code-bg: #1d292d;
+        --danger: #f05264;
+        --warn: #f59e0b;
+        --safe: #4ade80;
+      }
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      overflow-x: hidden;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: system-ui, -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif;
+      line-height: 1.7;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+    a { color: var(--accent-ink); }
+    img { max-width: 100%; height: auto; display: block; }
+    .wrap { max-width: 960px; margin: 0 auto; padding: 0 20px; }
+
+    /* 상단 메뉴 */
+    nav.top {
+      position: sticky; top: 0; z-index: 10;
+      background: color-mix(in srgb, var(--bg) 92%, transparent);
+      backdrop-filter: blur(6px);
+      border-bottom: 1px solid var(--line);
+    }
+    nav.top .wrap { display: flex; gap: 18px; align-items: center; height: 52px; overflow-x: auto; white-space: nowrap; }
+    nav.top strong { margin-right: 6px; }
+    nav.top a { color: var(--muted); text-decoration: none; font-size: 14px; }
+    nav.top a:hover { color: var(--ink); }
+
+    /* 첫 화면 */
+    header.hero { padding: 56px 0 32px; }
+    .eyebrow { color: var(--accent-ink); font-weight: 700; font-size: 14px; letter-spacing: .04em; margin: 0 0 8px; }
+    h1 { font-size: clamp(34px, 7vw, 56px); line-height: 1.15; margin: 0 0 14px; letter-spacing: -0.02em; }
+    .lead { font-size: clamp(17px, 2.6vw, 20px); color: var(--muted); margin: 0 0 22px; max-width: 760px; }
+    .ask {
+      display: inline-block; background: var(--tint); border: 1px solid var(--line);
+      border-radius: 999px; padding: 8px 18px; font-weight: 600; margin-bottom: 24px;
+    }
+    .buttons { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 32px; }
+    .btn {
+      display: inline-block; padding: 10px 18px; border-radius: 10px; font-weight: 700;
+      text-decoration: none; border: 1px solid var(--line); color: var(--ink); background: var(--surface);
+    }
+    .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+    @media (prefers-color-scheme: dark) { .btn.primary { color: #0f1517; } }
+    .shot { border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: var(--surface); box-shadow: 0 8px 28px rgba(0,0,0,.06); }
+    figure { margin: 0; }
+    figcaption { font-size: 14px; color: var(--muted); margin-top: 8px; }
+
+    /* 공통 섹션 */
+    section { padding: 48px 0; border-top: 1px solid var(--line); }
+    h2 { font-size: clamp(24px, 4vw, 30px); margin: 0 0 6px; letter-spacing: -0.01em; }
+    h2 + .sub { color: var(--muted); margin: 0 0 24px; }
+    h3 { font-size: 18px; margin: 28px 0 10px; }
+    .grid { display: grid; gap: 16px; }
+    .g2 { grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); }
+    .g3 { grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); }
+    .grid > *, .flow > *, .stats > * { min-width: 0; }
+    .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px 20px; }
+    .card h4 { margin: 0 0 6px; font-size: 16px; }
+    .card p { margin: 0; color: var(--muted); font-size: 15px; }
+    .card.us { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+    .card.us h4 { color: var(--accent-ink); }
+
+    table { width: 100%; border-collapse: collapse; font-size: 15px; background: var(--surface); }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { background: var(--tint); font-weight: 700; }
+    tr:last-child td { border-bottom: 0; }
+    .table-scroll { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; }
+    .table-scroll table { min-width: 600px; }
+    td.num, th.num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .best { font-weight: 700; color: var(--accent-ink); }
+
+    /* 영상 */
+    .video { position: relative; aspect-ratio: 16 / 9; border-radius: 14px; overflow: hidden; border: 1px solid var(--line); background: #000; }
+    .video iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+    /* 작동 원리 */
+    .flow { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(min(150px, 100%), 1fr)); counter-reset: step; }
+    .step { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+    .step::before {
+      counter-increment: step; content: counter(step);
+      display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%;
+      background: var(--dark); color: #fff; font-weight: 700; font-size: 14px; margin-bottom: 8px;
+    }
+    .step.ai::before { background: var(--accent); }
+    .step h4 { margin: 0 0 2px; font-size: 16px; }
+    .step .tech { font-size: 13px; color: var(--accent-ink); font-weight: 700; margin: 0 0 6px; }
+    .step p { margin: 0; font-size: 14px; color: var(--muted); }
+
+    .levels { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); }
+    .level { border-radius: 14px; padding: 16px 18px; background: var(--surface); border: 1px solid var(--line); border-left: 6px solid var(--c); }
+    .level b { color: var(--c); font-size: 17px; }
+    .level p { margin: 4px 0 0; color: var(--muted); font-size: 15px; }
+
+    .note { background: var(--tint); border-left: 4px solid var(--accent); border-radius: 8px; padding: 12px 16px; margin: 18px 0 0; font-size: 15px; }
+    code { background: var(--code-bg); padding: 1px 6px; border-radius: 6px; font-size: .92em; }
+
+    /* 결과 */
+    .stats { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(min(190px, 100%), 1fr)); margin-bottom: 8px; }
+    .stat { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 16px 18px; }
+    .stat .big { font-size: 32px; font-weight: 800; line-height: 1.2; color: var(--accent-ink); }
+    .stat .lbl { font-size: 14px; color: var(--muted); }
+    .bars { display: grid; gap: 8px; margin-top: 8px; }
+    .bar { display: grid; grid-template-columns: 190px 1fr 60px; gap: 10px; align-items: center; font-size: 14px; }
+    .bar .track { background: var(--code-bg); border-radius: 6px; height: 14px; overflow: hidden; }
+    .bar .fill { background: #8aa3a8; height: 100%; border-radius: 6px; }
+    .bar.top .fill { background: var(--accent); }
+    .bar.top { font-weight: 700; }
+    .bar .v { text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
+    @media (prefers-color-scheme: dark) { .bar .fill { background: #4b5f64; } }
+
+    ul.clean { margin: 0; padding-left: 20px; }
+    ul.clean li { margin: 4px 0; }
+    footer { padding: 32px 0 48px; color: var(--muted); font-size: 14px; border-top: 1px solid var(--line); }
+
+    @media (max-width: 560px) {
+      .bar { grid-template-columns: 120px 1fr 52px; font-size: 13px; }
+      section { padding: 36px 0; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="top" aria-label="페이지 메뉴">
+  <div class="wrap">
+    <strong>이안류 긴급 알리미</strong>
+    <a href="#problem">문제</a>
+    <a href="#demo">해결과 데모</a>
+    <a href="#how">작동 원리</a>
+    <a href="#result">결과</a>
+    <a href="#limit">한계</a>
+    <a href="#team">팀과 링크</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">K-Digital Training · CV 프로젝트 · 팀 비버즈 4인 · 2026.09</p>
+    <h1>이안류 긴급 알리미</h1>
+    <p class="lead">해안 CCTV 영상에서 이안류 위험 구역과 바다에 들어간 사람을 동시에 찾고, 위험 구역 안에 사람이 들어가면 현장 사진과 함께 안전요원 스마트폰으로 바로 알려 주는 관제 보조 시스템입니다.</p>
+    <div class="ask">이안류 구역 안에 사람 감지 → 3초 안에 안전요원 앱으로 알림</div>
+    <div class="buttons">
+      <a class="btn primary" href="#demo">시연 영상 보기</a>
+      <a class="btn" href="#how">작동 원리</a>
+      <a class="btn" href="https://github.com/artaban125/rip-current-alert">코드 (GitHub)</a>
+    </div>
+    <figure class="shot">
+      <img src="images/desktop-console.jpg" width="1280" height="720" alt="데스크톱 관제 콘솔 화면. 해변 CCTV 영상 위에 파란색 RIP 27% 이안류 구역 박스와 그 안의 빨간 DANGER 입수자 박스가 표시되고, 상단에 '긴급 · 이안류 발생 · 위험 인원 2명 · 전체 4명', 오른쪽에 위험 구역 침범 스냅샷 목록이 보인다.">
+    </figure>
+    <figcaption>데스크톱 관제 콘솔 — 이안류 구역(RIP)과 그 안의 입수자(DANGER)를 동시에 탐지해 긴급 단계로 표시</figcaption>
+  </div>
+</header>
+
+<main>
+
+<section id="problem">
+  <div class="wrap">
+    <h2>문제</h2>
+    <p class="sub">이안류는 해안에서 먼바다 쪽으로 빠르게 빠져나가는 좁은 물줄기입니다. 휩쓸리면 혼자 빠져나오기 어렵고, 1~2분 만에 100m 이상 떠밀릴 수 있습니다.</p>
+
+    <div class="stats">
+      <div class="stat"><div class="big">307명</div><div class="lbl">최근 5년 국내 연안 익수 사망자 (해양경찰청)</div></div>
+      <div class="stat"><div class="big">1,001명</div><div class="lbl">이안류 관련 구조 인원 (해양수산부)</div></div>
+      <div class="stat"><div class="big">4분</div><div class="lbl">익수 사고 골든타임</div></div>
+    </div>
+
+    <h3>기존 감시와의 차이</h3>
+    <div class="grid g3">
+      <div class="card">
+        <h4>이안류 지수 서비스</h4>
+        <p>해수욕장별 이안류 위험도를 4단계로 알려 주지만, 특정 CCTV 화면 속 위험 구역 안에 사람이 있는지는 알려 주지 않습니다.</p>
+      </div>
+      <div class="card">
+        <h4>CCTV 육안 관제</h4>
+        <p>안전요원이 넓은 해변을 여러 화면으로 계속 지켜봐야 합니다. 몇 픽셀 크기의 사람을 눈으로 찾는 데 시간이 걸립니다.</p>
+      </div>
+      <div class="card us">
+        <h4>이안류 긴급 알리미</h4>
+        <p>이안류 구역과 사람을 함께 탐지해 <b>"구역 안에 사람이 있는가"</b>까지 판단하고, 긴급할 때만 사진과 함께 알림을 보냅니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="demo">
+  <div class="wrap">
+    <h2>해결 방법과 데모</h2>
+    <p class="sub">같은 탐지 모델로 두 가지 관제 콘솔을 만들었습니다. 웹 콘솔은 시연과 경보 이력 관리에, 데스크톱 콘솔은 GPU를 쓰는 실시간 관제에 맞췄습니다.</p>
+
+    <div class="grid g2">
+      <figure>
+        <div class="video">
+          <iframe src="https://www.youtube-nocookie.com/embed/ff4h6k_VPQU" title="데스크톱 관제 콘솔 시연 영상" loading="lazy" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        </div>
+        <figcaption><b>데스크톱 관제 콘솔</b> (C# .NET 8 WPF) — 실시간 탐지, 위험 구역 침범 스냅샷, 관제 로그·환경설정 · <a href="https://www.youtube.com/watch?v=ff4h6k_VPQU">YouTube에서 보기</a></figcaption>
+      </figure>
+      <figure>
+        <div class="video">
+          <iframe src="https://www.youtube-nocookie.com/embed/lMzr49sQp6w" title="웹 관제 콘솔 시연 영상" loading="lazy" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        </div>
+        <figcaption><b>웹 관제 콘솔</b> (Streamlit) — 영상 업로드 분석, 위험 등급 표시, 긴급 경보 순간 캡처 · <a href="https://www.youtube.com/watch?v=lMzr49sQp6w">YouTube에서 보기</a></figcaption>
+      </figure>
+    </div>
+
+    <h3>위험 등급</h3>
+    <div class="levels">
+      <div class="level" style="--c: var(--safe)"><b>관찰</b><p>이안류 의심 구역 없음</p></div>
+      <div class="level" style="--c: var(--warn)"><b>경고</b><p>이안류 구역은 있으나 구역 안에 사람 없음</p></div>
+      <div class="level" style="--c: var(--danger)"><b>긴급</b><p>이안류 구역 안에 사람 감지 → 스마트폰 알림 발송</p></div>
+    </div>
+
+    <figure class="shot" style="margin-top: 20px">
+      <img src="images/web-console.jpg" width="1280" height="720" loading="lazy" alt="웹 관제 콘솔 화면. 상단 빨간 바에 '긴급 | 구역 내 인원 2 | 화면 전체 인원 10 | 이안류 의심 구역 1', 영상 오른쪽에 반투명 빨간 이안류 구역과 그 안의 사람 박스, 하단에 '긴급 — 즉시 확인 후 안내 방송과 현장 출동을 검토하세요', 오른쪽에 긴급 경보 발생 순간 캡처 목록이 보인다.">
+    </figure>
+    <figcaption>웹 관제 콘솔 — 긴급 판정 시 상·하단 바가 빨간색으로 바뀌고 오른쪽에 경보 순간 캡처가 쌓임</figcaption>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <h2>작동 원리</h2>
+    <p class="sub">이안류 모델과 사람 모델, 두 개의 AI 모델이 같은 프레임을 따로 분석한 뒤, 결과를 겹쳐서 위험을 판정합니다.</p>
+
+    <div class="flow">
+      <div class="step"><h4>영상 입력</h4><p class="tech">CCTV 녹화 영상</p><p>웹은 업로드, 데스크톱은 파일을 열어 프레임 단위로 처리</p></div>
+      <div class="step ai"><h4>이안류 구역</h4><p class="tech">YOLO11m</p><p>수면에서 이안류 의심 구역을 박스로 검출</p></div>
+      <div class="step ai"><h4>입수자</h4><p class="tech">YOLO11m · SAHI</p><p>넓은 화면을 768px 타일로 나눠 몇 픽셀 크기의 사람까지 검출</p></div>
+      <div class="step"><h4>침범 판정</h4><p class="tech">공간 교차</p><p>사람이 이안류 구역 안에 있는지 판정 → 관찰·경고·긴급</p></div>
+      <div class="step"><h4>알림 필터</h4><p class="tech">연속·쿨다운</p><p>파도 거품 오탐과 알림 폭주를 막는 필터 통과 시에만 발송</p></div>
+      <div class="step ai"><h4>푸시 알림</h4><p class="tech">Firebase FCM</p><p>스냅샷·인원 수·위험 등급을 안드로이드 앱으로 전송</p></div>
+    </div>
+
+    <h3>알림 폭주를 막는 필터 (데스크톱 콘솔)</h3>
+    <p>30fps 영상에서 긴급 판정이 계속되면 알림이 수백 통 나갈 수 있습니다. 아래 조건을 거쳐 꼭 필요할 때만 스냅샷을 저장하고 알림을 보냅니다.</p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>조건</th><th>기본값</th><th>하는 일</th></tr></thead>
+        <tbody>
+          <tr><td>연속 판정</td><td>3프레임</td><td>위험이 3프레임 연속일 때만 사고 세션 시작 (파도 거품 같은 순간 오탐 제거)</td></tr>
+          <tr><td>새 위치</td><td>220px</td><td>기존 위험 지점에서 220px 밖에 새 사람이 나타나면 바로 다시 캡처</td></tr>
+          <tr><td>인원 증가</td><td>—</td><td>구역 안 위험 인원이 늘면 바로 다시 캡처</td></tr>
+          <tr><td>같은 구역 억제</td><td>13초</td><td>같은 구역은 13초 동안 다시 캡처하지 않음</td></tr>
+          <tr><td>세션 종료</td><td>4초</td><td>위험이 4초 동안 없으면 사고 세션 종료</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>두 관제 콘솔 비교</h3>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th></th><th>데스크톱 관제 콘솔</th><th>웹 관제 콘솔</th></tr></thead>
+        <tbody>
+          <tr><td>기술</td><td>C# .NET 8 WPF, ONNX Runtime (DirectML GPU), OpenCvSharp</td><td>Python, Streamlit, Ultralytics, SAHI, PyTorch (FP16)</td></tr>
+          <tr><td>침범 판정</td><td>사람 박스와 이안류 박스의 교차 영역</td><td>사람 발 위치(박스 하단 중앙)가 이안류 구역 안(경계 15px 여유)</td></tr>
+          <tr><td>속도</td><td>30 FPS 실시간 처리</td><td>스냅샷·발송을 백그라운드 스레드로 분리</td></tr>
+          <tr><td>경보 이력</td><td>SQLite 로그, 발송 상태·확인 여부, 스냅샷 보기</td><td>SQLite 이벤트 저장, 화면에서 "확인 완료" 처리</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">안드로이드 앱(Kotlin)은 FCM 토픽 <code>rip_current_alert</code>를 구독해, 알림이 오면 구역·인원 수·감지 시각·위험 등급을 보여 주고 현장 스냅샷을 핀치 줌으로 확대해 볼 수 있습니다.</p>
+  </div>
+</section>
+
+<section id="result">
+  <div class="wrap">
+    <h2>결과</h2>
+    <p class="sub">"미지 해변"은 학습·검증에서 완전히 격리한 낙산·대천 해변 400장입니다. 처음 보는 해변에서도 통하는지를 보는 실전 기준입니다.</p>
+
+    <div class="stats">
+      <div class="stat"><div class="big">+80.4%</div><div class="lbl">미지 해변 Recall<br>0.2031 → 0.3664</div></div>
+      <div class="stat"><div class="big">11,460장</div><div class="lbl">정제한 Dataset v2<br>279,151장 · 7개 해변에서</div></div>
+      <div class="stat"><div class="big">0.7526</div><div class="lbl">이안류 검증 mAP50<br>(YOLO11m)</div></div>
+      <div class="stat"><div class="big">30 FPS</div><div class="lbl">실시간 관제<br>위험 시 3초 안에 알림</div></div>
+    </div>
+
+    <h3>미지 해변 Recall (낙산·대천 400장)</h3>
+    <div class="bars" role="img" aria-label="미지 해변 Recall: 1차 YOLOv8m 무작위 분할 0.2031, YOLO11s 0.3046, YOLO11m 0.3664, YOLO11x 0.0662">
+      <div class="bar"><span>1차 YOLOv8m (무작위 분할)</span><div class="track"><div class="fill" style="width: 20.31%"></div></div><span class="v">0.2031</span></div>
+      <div class="bar"><span>YOLO11s (9.4M)</span><div class="track"><div class="fill" style="width: 30.46%"></div></div><span class="v">0.3046</span></div>
+      <div class="bar top"><span>YOLO11m (20.1M) ★</span><div class="track"><div class="fill" style="width: 36.64%"></div></div><span class="v">0.3664</span></div>
+      <div class="bar"><span>YOLO11x (56.9M)</span><div class="track"><div class="fill" style="width: 6.62%"></div></div><span class="v">0.0662</span></div>
+    </div>
+
+    <h3>이안류 모델 비교 (같은 Dataset v2)</h3>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>모델</th><th class="num">검증 mAP50</th><th class="num">미지 mAP50</th><th class="num">미지 Recall</th><th class="num">F1</th></tr></thead>
+        <tbody>
+          <tr><td>YOLO11s (9.4M)</td><td class="num">0.7508</td><td class="num">0.2336</td><td class="num">0.3046</td><td class="num">0.3909</td></tr>
+          <tr class="best"><td>YOLO11m (20.1M) ★</td><td class="num">0.7526</td><td class="num">0.2546</td><td class="num">0.3664</td><td class="num">0.4023</td></tr>
+          <tr><td>YOLO11x (56.9M)</td><td class="num">0.7380</td><td class="num">0.0880</td><td class="num">0.0662</td><td class="num">0.1197</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>가장 큰 11x는 해안 배경을 외워 미지 해변에서 무너졌고, 전 지표 1위인 <b>11m</b>을 최종 모델로 골랐습니다. 모델 크기와 일반화 성능이 역 U자 관계였습니다.</p>
+
+    <h3>문제와 해결</h3>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>문제</th><th>원인과 조치</th><th>결과</th></tr></thead>
+        <tbody>
+          <tr><td>검증 mAP50 0.7410인데 미지 해변 Recall 0.2031</td><td>무작위 분할로 같은 카메라·시간대 프레임이 Train/Val에 섞임 → 15초 간격 샘플링 + 날짜·시간·카메라 기준 GroupKFold 분할, 스페인 해변 데이터 결합</td><td class="best">Recall 0.3664</td></tr>
+          <tr><td>세그멘테이션 학습 붕괴 (mask mAP50 0.0042)</td><td>SAM으로 만든 마스크 라벨 품질 문제 → 박스 탐지로 전환</td><td class="best">검증 mAP50 0.7526</td></tr>
+          <tr><td>멀리 있는 입수자를 거의 못 찾음</td><td>학습 데이터의 사람이 실제 CCTV보다 큼 → 작은 사람 위주 재정제, 1280 해상도 파인튜닝, SAHI 타일 추론</td><td class="best">mAP50 0.827 → 0.907</td></tr>
+          <tr><td>파도 거품으로 알림 폭주</td><td>연속 판정 · 새 위치 · 인원 증가 · 같은 구역 억제 필터</td><td class="best">중복 알림 억제</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>사람 탐지 모델: 학습 데이터 점수와 실제 점수</h3>
+    <div class="grid g2">
+      <div>
+        <p>프로젝트 이후, 학습에 쓰지 않은 해안 서프캠 이미지 2,413장으로 사람 모델을 다시 평가했습니다. 학습 데이터 기준 점수가 실제 성능을 크게 부풀리고 있었지만, 작은 사람에 맞춘 파인튜닝의 효과는 처음 보는 데이터에서도 확인됐습니다.</p>
+        <ul class="clean">
+          <li>1차 학습: 학습 데이터 mAP50 0.827 → 처음 보는 데이터 <b>0.410</b></li>
+          <li>2차 파인튜닝: 학습 데이터 mAP50 0.907 → 처음 보는 데이터 <b>0.499</b></li>
+        </ul>
+      </div>
+      <figure class="shot">
+        <img src="images/person-train-vs-unseen.png" loading="lazy" alt="사람 탐지 모델의 학습 데이터 기준 점수와 처음 보는 데이터 점수를 1차 학습과 2차 파인튜닝으로 비교한 막대 그래프">
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section id="limit">
+  <div class="wrap">
+    <h2>한계와 다음 단계</h2>
+    <div class="grid g2">
+      <div class="card">
+        <h4>한계</h4>
+        <ul class="clean">
+          <li>실제 CCTV 실시간 스트림이 아니라 녹화 영상으로 동작합니다.</li>
+          <li>미지 해변 성능(Recall 0.37)이 검증 성능보다 크게 낮습니다.</li>
+          <li>출력은 관제 보조 정보입니다. 이안류를 공식 확정하거나 구조를 자동 요청하지 않습니다.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>다음 단계</h4>
+        <ul class="clean">
+          <li>RTSP 실시간 스트림 연동과 다중 CCTV 관제 대시보드</li>
+          <li>이안류 지수·파고·풍속·조류 등 해양 관측 데이터 결합</li>
+          <li>해변·카메라 단위로 분리한 평가셋으로 사람 모델 재학습</li>
+        </ul>
+      </div>
+    </div>
+    <p class="note"><b>배운 점</b> — 모델 크기보다 <b>분할 설계와 데이터 정제</b>가 실전 성능을 결정한다.</p>
+  </div>
+</section>
+
+<section id="team">
+  <div class="wrap">
+    <h2>팀과 링크</h2>
+    <p class="sub">팀 비버즈 · 4인 · 10일 · 2026.09</p>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>팀원</th><th>담당</th></tr></thead>
+        <tbody>
+          <tr><td>knlee</td><td>이안류 탐지 모델(Dataset v2 구축, YOLO11 학습·선정) · 데스크톱 관제 콘솔 · 알림 서비스</td></tr>
+          <tr><td>Miita212, jongho</td><td>사람(입수자) 탐지 모델 학습·파인튜닝</td></tr>
+          <tr><td>gonggong77</td><td>웹 관제 콘솔 · 안드로이드 알림 앱</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>링크</h3>
+    <ul class="clean">
+      <li>코드: <a href="https://github.com/artaban125/rip-current-alert">github.com/artaban125/rip-current-alert</a></li>
+      <li>데스크톱 관제 콘솔 시연: <a href="https://www.youtube.com/watch?v=ff4h6k_VPQU">YouTube</a></li>
+      <li>웹 관제 콘솔 시연: <a href="https://www.youtube.com/watch?v=lMzr49sQp6w">YouTube</a></li>
+      <li>기획보고서: <a href="https://github.com/artaban125/rip-current-alert/blob/main/docs/01_기획보고서.md">docs/01_기획보고서.md</a></li>
+    </ul>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">이안류 긴급 알리미 · 팀 비버즈 · K-Digital Training CV 과정 팀 프로젝트 (2026.09)</div>
+</footer>
+
+</body>
+</html>
