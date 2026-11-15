@@ -132,14 +132,13 @@ streamlit run app.py
 
 ## 팀원별 작업
 
-| 담당 영역 | 주요 결과물 | 서비스에 쓰인 곳 |
-| --- | --- | --- |
-| 이안류 탐지 모델 · 데스크톱 관제 콘솔 (artaban125) | YOLO11 s/m/x 이안류 모델, .NET 8 WPF 관제 콘솔 | 두 콘솔의 이안류 구역 탐지, 데스크톱 관제 전체 |
-| 사람(입수자) 탐지 모델 | YOLO11m 사람 모델 1차 학습 + 작은 사람 파인튜닝 | 두 콘솔의 입수자 탐지 (`swimmer` 모델) |
-| 웹 관제 콘솔 | Streamlit 영상 분석 화면, 듀얼 모델 추론 파이프라인 | 시연용 웹 관제 화면 |
-| 알림 서비스 · 안드로이드 앱 | FCM 발송 모듈, 알림 게이트, Android 수신 앱 | 긴급 알림 발송·수신 전체 |
+| 팀원 | 담당 영역 | 주요 결과물 | 서비스에 쓰인 곳 |
+| --- | --- | --- | --- |
+| knlee | 이안류 탐지 모델 · 데스크톱 관제 콘솔 · 알림 서비스 | YOLO11 s/m/x 이안류 모델, .NET 8 WPF 관제 콘솔, FCM 발송 모듈·알림 게이트 | 두 콘솔의 이안류 구역 탐지, 데스크톱 관제 전체, 긴급 알림 발송 |
+| Miita212, jongho | 사람(입수자) 탐지 모델 | YOLO11m 사람 모델 1차 학습 + 작은 사람 파인튜닝 | 두 콘솔의 입수자 탐지 (`swimmer` 모델) |
+| gonggong77 | 웹 관제 콘솔 · 안드로이드 앱 | Streamlit 영상 분석 화면·듀얼 모델 추론 파이프라인, Android 알림 수신 앱 | 시연용 웹 관제 화면, 현장 알림 수신 |
 
-### 이안류 탐지 모델 · 데스크톱 관제 콘솔 — artaban125
+### knlee — 이안류 탐지 모델 · 데스크톱 관제 콘솔 · 알림 서비스
 
 **`models/rip_current/` — 이안류 탐지 모델**
 - **데이터 정제 (`dataset.ipynb`)**
@@ -166,7 +165,14 @@ streamlit run app.py
 - **경보 이력 (`DatabaseLogger.cs`, `LogViewerWindow`)**: SQLite에 경보 기록, 발송 상태·확인 여부 관리, 스냅샷 보기
 - **설정 화면 (`SettingsWindow`, `AppSettings.cs`)**: 모델별 conf/IoU, 재캡처 억제 시간, 세션 종료 지연, 동일인 판정 반경을 `config.json`으로 저장
 
-### 사람(입수자) 탐지 모델
+**`apps/web_console/alert/` — 알림 발송 모듈**
+- **FCM 발송 (`fcm_alert.py`)**: 서비스 계정 키 경로 자동 탐색(환경변수 `FIREBASE_CREDENTIALS` 지원), 스냅샷을 Streamlit 정적 서빙(`/app/static/`)으로 제공해 별도 스토리지 없이 이미지 URL 전달
+- **알림 게이트 (`gate.py`)**: 연속 판정 횟수 + 쿨다운으로 알림 남발 방지, **위험 인원이 늘면 즉시 재발송**
+- **알림 어댑터 (`notifier.py`, `sender.py`)**: 웹에서는 `notifier.send(event)` 한 줄로 발송, 발송은 백그라운드에서 처리
+- **이벤트 저장 (`store.py`)**: 발송 성공 여부와 관계없이 모든 이벤트를 SQLite에 기록해 재전송·디버깅 가능
+- **발송 테스트 (`send_test.py`)**: 화면 없이 CLI로 알림 발송 확인
+
+### Miita212 · jongho — 사람(입수자) 탐지 모델
 
 **`models/person/`** — 자세한 과정과 수치는 [`models/person/README.md`](models/person/README.md)에 있습니다.
 - **데이터 정제**: Roboflow 원본 4,955장 → 유사 프레임 제거(64×64 축소 MSE 비교) → 배경 비율 조정 → **1,028장** (사람 878 · 배경 150)
@@ -175,7 +181,7 @@ streamlit run app.py
 - **서비스 적용 제안**: 넓은 화면의 작은 사람 대응을 위해 SAHI 타일 슬라이싱을 함께 쓰는 방식으로 웹 콘솔에 적용
 - **프로젝트 이후 추가 검증 (2026.11)**: 학습에 쓰지 않은 서프캠 데이터 2,413장으로 재평가해 실제 성능(mAP50 0.41 → 0.50)과 파인튜닝 효과를 확인
 
-### 웹 관제 콘솔
+### gonggong77 — 웹 관제 콘솔 · 안드로이드 앱
 
 **`apps/web_console/`** (`app.py`, `views/`, `core/`)
 - **Streamlit 관제 화면**: 사이드바 영상 업로드 → 분석 시작, 실시간 오버레이 영상, 위험 등급 상·하단 바, 캡처 갤러리, 우측 경보 카드, 실시간 로그, 경보 "확인 완료" 처리
@@ -185,15 +191,6 @@ streamlit run app.py
   - GPU FP16, `torch.inference_mode()`로 추론 가속, 스냅샷 인코딩과 발송은 백그라운드 스레드로 넘겨 분석이 멈추지 않게 함
 - **판정 규칙 (`core/rules.py`)**: 사람 박스 **발 위치(하단 중앙)** 가 이안류 폴리곤 안(경계 15px 여유)에 있는지로 판정
 - **렌더링 (`core/render.py`)**: 이안류 반투명 채우기, 사람 안전/위험 색 구분, 등급별 색상과 설명 문구
-
-### 알림 서비스 · 안드로이드 앱
-
-**`apps/web_console/alert/` — 알림 발송 모듈**
-- **FCM 발송 (`fcm_alert.py`)**: 서비스 계정 키 경로 자동 탐색(환경변수 `FIREBASE_CREDENTIALS` 지원), 스냅샷을 Streamlit 정적 서빙(`/app/static/`)으로 제공해 별도 스토리지 없이 이미지 URL 전달
-- **알림 게이트 (`gate.py`)**: 연속 판정 횟수 + 쿨다운으로 알림 남발 방지, **위험 인원이 늘면 즉시 재발송**
-- **알림 어댑터 (`notifier.py`, `sender.py`)**: 웹에서는 `notifier.send(event)` 한 줄로 발송, 발송은 백그라운드에서 처리
-- **이벤트 저장 (`store.py`)**: 발송 성공 여부와 관계없이 모든 이벤트를 SQLite에 기록해 재전송·디버깅 가능
-- **발송 테스트 (`send_test.py`)**: 화면 없이 CLI로 알림 발송 확인
 
 **`apps/android_alert/` — 안드로이드 알림 앱 (Kotlin)**
 - **FCM 수신 (`MyFirebaseMessagingService.kt`)**: `rip_current_alert` 토픽 구독, 높은 중요도 알림 채널과 진동, 위험 등급별 알림 색상
